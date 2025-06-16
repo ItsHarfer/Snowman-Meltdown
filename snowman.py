@@ -5,13 +5,15 @@ Main entry point for the Snowman Meltdown game.
 
 This module initializes and manages the full game loop. It selects a random word,
 displays the snowman ASCII art based on the number of incorrect guesses, and processes
-user input until the word is guessed or the snowman melts.
+user input until the word is guessed or the snowman melts. The game includes input
+validation, a replay option, and extended ASCII art stages for smoother transitions.
 
 Functions:
 - get_random_word: Selects a random word from the word list.
-- display_game_state: Displays current snowman stage and masked word.
+- get_valid_input: Ensures input is a valid, new single alphabetical character.
+- display_game_state: Displays current snowman stage, word progress, and guessed letters.
 - play_game: Manages the interactive gameplay loop with win/loss conditions.
-- main: Entry point to start the game.
+- main: Entry point to start the game with replay functionality.
 
 Author: Martin Haferanke
 Date: 16.06.2025
@@ -20,11 +22,8 @@ Date: 16.06.2025
 import random
 import re
 
-from config.config import STAGES
+from config.config import STAGES, WORDS
 from typing import List
-
-
-WORDS = ["python", "git", "github", "snowman", "meltdown", "coffee"]
 
 
 def get_random_word() -> str:

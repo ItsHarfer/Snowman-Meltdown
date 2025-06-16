@@ -41,3 +41,5 @@ STAGES = [
      /___\\ 
     """,
 ]
+
+WORDS = ["python", "git", "github", "snowman", "meltdown", "coffee"]
