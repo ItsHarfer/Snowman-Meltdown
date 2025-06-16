@@ -18,6 +18,8 @@ Date: 16.06.2025
 """
 
 import random
+import re
+
 from config.config import STAGES
 from typing import List
 
@@ -35,6 +37,25 @@ def get_random_word() -> str:
     return random.choice(WORDS)
 
 
+def get_valid_input(guessed_letters: List[str]) -> str:
+    """
+    Prompts the user until a valid, new single letter is entered.
+
+    :param guessed_letters: List of already guessed letters.
+    :type guessed_letters: List[str]
+    :return: A valid single lowercase letter.
+    :rtype: str
+    """
+    while True:
+        guess = input("Guess a letter: ").lower().strip()
+        if not re.fullmatch(r"[a-zA-Z]", guess):
+            print("Invalid input. Please enter a single letter (a-z).")
+        elif guess in guessed_letters:
+            print("You already guessed that letter.")
+        else:
+            return guess
+
+
 def display_game_state(
     mistakes: int, secret_word: str, guessed_letters: List[str]
 ) -> None:
@@ -49,12 +70,18 @@ def display_game_state(
     :type guessed_letters: List[str]
     :return: None
     """
-    print(STAGES[mistakes])
+    print("\n" + "=" * 30)
+    print(STAGES[min(mistakes, len(STAGES) - 1)])
+    print("Mistakes:", mistakes, "/", len(STAGES) - 1)
+
     display_word = ""
     for letter in secret_word:
         display_word += letter + " " if letter in guessed_letters else "_ "
-    print("Word:", display_word)
-    print()
+    print("Word:", display_word.strip())
+    print("Guessed letters:", " ".join(sorted(guessed_letters)))
+
+    # A little divider
+    print("=" * 30 + "\n")
 
 
 def play_game() -> None:
@@ -73,26 +100,23 @@ def play_game() -> None:
 
     while True:
         display_game_state(mistakes, secret_word, guessed_letters)
-        guess = input("Guess a letter: ").lower()
-
-        if guess in guessed_letters:
-            print("You already guessed that letter.")
-            continue
-
+        guess = get_valid_input(guessed_letters)
         guessed_letters.append(guess)
 
         if guess not in secret_word:
             mistakes += 1
             print("Incorrect!")
 
-        if all(letter in guessed_letters for letter in secret_word):
+        game_won = all(letter in guessed_letters for letter in secret_word)
+
+        if game_won:
             display_game_state(mistakes, secret_word, guessed_letters)
-            print("Congratulations! You saved the snowman!")
+            print("🎉 Congratulations! You saved the snowman!\n")
             break
 
         if mistakes >= max_mistakes:
             display_game_state(mistakes, secret_word, guessed_letters)
-            print("Oh no! The snowman melted! The word was:", secret_word)
+            print(f"💥 Oh no! The snowman melted! The word was: '{secret_word}'\n")
             break
 
 
@@ -102,7 +126,12 @@ def main() -> None:
 
     :return: None
     """
-    play_game()
+    while True:
+        play_game()
+        replay = input("Play again? (y/n): ").lower().strip()
+        if replay != "y":
+            print("Thanks for playing Snowman Meltdown! ❄️")
+            break
 
 
 if __name__ == "__main__":
